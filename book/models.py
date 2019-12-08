@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model
 class User(models.Model):
   username = models.CharField(max_length=20, unique=True)
   email = models.EmailField(unique=True)
-  first_name = models.CharField(max_length=35)
-  last_name = models.CharField(max_length=35)
+  first_name = models.CharField(max_length=35, null=True, blank=True)
+  last_name = models.CharField(max_length=35, null=True, blank=True)
   REQUIRED_FIELDS = []
   USERNAME_FIELD = 'username'
   is_anonymous = False
