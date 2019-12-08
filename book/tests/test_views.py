@@ -264,5 +264,27 @@ class RecipeTest(TestCase):
     self.assertIn(step2, steps)
     self.assertIn(ingredient2, ingredients)
 
+  def test_can_delete_a_recipe(self):
+    user1 = User(username="hello123", email="hello123@example.com")
+    user1.save()
+    recipe1 = {
+      "name": "recipe 1",
+      "user": user1.pk,
+      "steps": [
+        "Do first thing",
+        "Do second thing",
+        "Do third thing"
+      ],
+      "ingredients": [
+        "First ingredient",
+        "Second ingredient",
+        "third ingredient"
+      ]
+    }
+    response1 = json.loads(self.client.post('/recipes/new', data=json.dumps(recipe1), content_type="application/json").content)
+    recipe = Recipe.objects.get(pk=response1['pk'])
+    self.assertEqual(recipe.name, "recipe 1")
+    response2 = self.client.delete(f'/recipes/{recipe.pk}/')
+    self.assertRaises(ObjectDoesNotExist, lambda: Recipe.objects.get(pk=response1['pk']))
 
 

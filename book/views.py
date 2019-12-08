@@ -67,6 +67,12 @@ def new_recipe(request):
     return JsonResponse({"error": str(e)})
 
 @csrf_exempt
+def single_recipe(request, recipe_id):
+  if(request.method == 'PATCH'):
+    return update_recipe(request, recipe_id)
+  elif(request.method == 'DELETE'):
+    return delete_recipe(request, recipe_id)
+
 def update_recipe(request, recipe_id):
   recipe = Recipe.objects.get(pk=recipe_id)
   data = json.loads(request.body)
@@ -98,6 +104,14 @@ def update_recipe(request, recipe_id):
   serializer = RecipeSerializer(recipe)
   json_data = JSONRenderer().render(serializer.data)
   return HttpResponse(json_data)
+
+def delete_recipe(request, recipe_id):
+  recipe = Recipe.objects.get(pk=recipe_id)
+  serializer = RecipeSerializer(recipe)
+  json_data = JSONRenderer().render(serializer.data)
+  recipe.delete()
+  return HttpResponse(json_data)
+
 
 
 
