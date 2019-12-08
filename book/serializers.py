@@ -7,3 +7,9 @@ class RecipeSerializer(serializers.ModelSerializer):
   class Meta:
     model = Recipe
     fields = ['pk', 'name', 'user_id', 'step_set', 'ingredient_set']
+
+class UserSerializer(serializers.ModelSerializer):
+  recipe = RecipeSerializer(read_only=True)
+  class Meta:
+    model = User
+    fields = ['pk', 'username', 'email', 'first_name', 'last_name', 'recipe']

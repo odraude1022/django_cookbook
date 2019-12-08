@@ -1,11 +1,11 @@
-from django.core import serializers
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+# from django.core import serializers
 from django.http import HttpResponse, JsonResponse
-from book.models import User, Recipe, Step, Ingredient
-from book.serializers import RecipeSerializer
-import json
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
+from book.models import User, Recipe, Step, Ingredient
+from book.serializers import UserSerializer, RecipeSerializer
+import json
 
 @csrf_exempt
 def new_user(request):
@@ -18,15 +18,19 @@ def new_user(request):
   new_user = User(username=username, email=email, first_name=first_name, last_name=last_name)
   try:
     new_user.save()
-    serialized_data = serializers.serialize('json', [ new_user])  
-    return HttpResponse(serialized_data)
+
+    serializer = UserSerializer(new_user)
+    json_data = JSONRenderer().render(serializer.data)
+    return HttpResponse(json_data)
   except Exception as e:
     return JsonResponse({"error": str(e)})
 
 def get_all_users(request):
   data = User.objects.all()
-  serialized_data = serializers.serialize('json', data)
-  return HttpResponse(serialized_data)
+  serializer = UserSerializer(data, many=True)
+  json_data = JSONRenderer().render(serializer.data)
+
+  return HttpResponse(json_data)
 
 @csrf_exempt
 def new_recipe(request):
