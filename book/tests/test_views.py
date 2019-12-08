@@ -45,6 +45,19 @@ class UserTest(TestCase):
     self.assertContains(response, "hello123")
     self.assertContains(response, "goodbye123")
 
+  def test_can_get_one_user(self):
+    user1 = User(username="hello123", email="hello123@example.com")
+    user1.save()
+    user2 = User(username="goodbye123", email="goodbye123@example.com")
+    user2.save()
+    response = self.client.get(f'/users/{user1.pk}/')
+    self.assertContains(response, "hello123")
+    self.assertNotContains(response, "goodbye123")
+
+  def test_get_error_when_trying_to_get_user_that_doesnt_exist(self):
+    response = self.client.get(f'/users/1/')
+    self.assertContains(response, "error")
+
 class RecipeTest(TestCase):
   def test_can_create_new_recipe(self):
     user1 = User(username="hello123", email="hello123@example.com")

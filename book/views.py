@@ -1,4 +1,5 @@
 # from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -31,6 +32,16 @@ def get_all_users(request):
   json_data = JSONRenderer().render(serializer.data)
 
   return HttpResponse(json_data)
+
+def get_user(request, user_id):
+  try:
+    data = User.objects.get(pk=user_id)
+    serializer = UserSerializer(data)
+    json_data = JSONRenderer().render(serializer.data)
+
+    return HttpResponse(json_data)
+  except ObjectDoesNotExist as e:
+    return JsonResponse({"error": "No user exists with this id"})
 
 @csrf_exempt
 def new_recipe(request):
