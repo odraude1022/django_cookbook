@@ -3,7 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from book.models import User, Recipe, Step, Ingredient
+from book.serializers import RecipeSerializer
 import json
+from rest_framework.renderers import JSONRenderer
 
 @csrf_exempt
 def new_user(request):
@@ -42,7 +44,9 @@ def new_recipe(request):
       
     for ingredient in ingredients:
       Ingredient(recipe_id=new_recipe.pk, text=ingredient).save()
-    serialized_data = serializers.serialize('json', [new_recipe])
-    return HttpResponse(serialized_data)
+
+    serializer = RecipeSerializer(new_recipe)
+    json_data = JSONRenderer().render(serializer.data)
+    return HttpResponse(json_data)
   except Exception as e:
     return JsonResponse({"error": str(e)})

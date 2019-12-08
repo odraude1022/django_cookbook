@@ -20,7 +20,13 @@ class Step(models.Model):
   step_text = models.TextField(default=None)
   recipe = models.ForeignKey(Recipe, default=None, on_delete=models.CASCADE)
 
+  def __str__(self):
+    return self.step_text
+
 class Ingredient(models.Model):
   text = models.CharField(max_length=30, default=None)
   recipe = models.ForeignKey(Recipe, default=None, on_delete=models.CASCADE)
+
+  def __str__(self):
+    return self.text
 

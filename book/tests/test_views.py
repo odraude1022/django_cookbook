@@ -121,8 +121,8 @@ class RecipeTest(TestCase):
     }
     response1 = json.loads(self.client.post('/recipes/new', data=json.dumps(new_recipe_1), content_type="application/json").content)
     response2 = json.loads(self.client.post('/recipes/new', data=json.dumps(new_recipe_2), content_type="application/json").content)
-    recipe1 = Recipe.objects.get(pk=response1[0]['pk'])
-    recipe2 = Recipe.objects.get(pk=response2[0]['pk'])
+    recipe1 = Recipe.objects.get(pk=response1['pk'])
+    recipe2 = Recipe.objects.get(pk=response2['pk'])
     steps1 = recipe1.step_set.all()
     steps2 = recipe2.step_set.all()
     step3 = Step.objects.get(step_text="Do third thing")
@@ -164,8 +164,8 @@ class RecipeTest(TestCase):
     }
     response1 = json.loads(self.client.post('/recipes/new', data=json.dumps(new_recipe_1), content_type="application/json").content)
     response2 = json.loads(self.client.post('/recipes/new', data=json.dumps(new_recipe_2), content_type="application/json").content)
-    recipe1 = Recipe.objects.get(pk=response1[0]['pk'])
-    recipe2 = Recipe.objects.get(pk=response2[0]['pk'])
+    recipe1 = Recipe.objects.get(pk=response1['pk'])
+    recipe2 = Recipe.objects.get(pk=response2['pk'])
 
 
 
