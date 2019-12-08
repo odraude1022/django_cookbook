@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from book.models import User, Recipe, Step, Ingredient
 import json
@@ -180,15 +181,88 @@ class RecipeTest(TestCase):
     recipe1 = Recipe.objects.get(pk=response1['pk'])
     recipe2 = Recipe.objects.get(pk=response2['pk'])
 
-
-
-
-
     ingredients1 = recipe1.ingredient_set.all()
     ingredients2 = recipe2.ingredient_set.all()
     ingredient3 = Ingredient.objects.get(text="third ingredient")
     self.assertIn(ingredient3, ingredients1)
     self.assertNotIn(ingredient3, ingredients2)
+
+  def test_can_update_recipe(self):
+    user1 = User(username="hello123", email="hello123@example.com")
+    user1.save()
+    recipe1 = {
+      "name": "recipe 1",
+      "user": user1.pk,
+      "steps": [
+        "Do first thing",
+        "Do second thing",
+        "Do third thing"
+      ],
+      "ingredients": [
+        "First ingredient",
+        "Second ingredient",
+        "third ingredient"
+      ]
+    }
+    recipe2 = {
+      "name": "recipe 2",
+      "steps": [
+        "Do first thing again",
+        "Do second thing again",
+        "Do third thing again"
+      ],
+      "ingredients": [
+        "First ingredient again",
+        "Second ingredient again",
+        "third ingredient again"
+      ]
+    }
+    response1 = json.loads(self.client.post('/recipes/new', data=json.dumps(recipe1), content_type="application/json").content)
+    pk = response1['pk']
+    response2 = self.client.patch(f'/recipes/{pk}/', data=json.dumps(recipe2), content_type="application/json")
+    self.assertContains(response2, "Do third thing again")
+    recipe = Recipe.objects.get(pk=response1['pk'])
+    self.assertEqual(recipe.name, "recipe 2")
+    steps = recipe.step_set.all()
+    ingredients = recipe.ingredient_set.all()
+    self.assertRaises(ObjectDoesNotExist, lambda: Step.objects.get(step_text="Do first thing"))
+    self.assertRaises(ObjectDoesNotExist, lambda: Ingredient.objects.get(text="First ingredient"))
+    step3 = Step.objects.get(step_text="Do third thing again")
+    ingredient3 = Ingredient.objects.get(text="third ingredient again")
+    self.assertIn(step3, steps)
+    self.assertIn(ingredient3, ingredients)
+
+  def test_can_update_recipe_with_only_changing_name(self):
+    user1 = User(username="hello123", email="hello123@example.com")
+    user1.save()
+    recipe1 = {
+      "name": "recipe 1",
+      "user": user1.pk,
+      "steps": [
+        "Do first thing",
+        "Do second thing",
+        "Do third thing"
+      ],
+      "ingredients": [
+        "First ingredient",
+        "Second ingredient",
+        "third ingredient"
+      ]
+    }
+    recipe2 = {
+      "name": "recipe 2"
+    }
+    response1 = json.loads(self.client.post('/recipes/new', data=json.dumps(recipe1), content_type="application/json").content)
+    pk = response1['pk']
+    response2 = self.client.patch(f'/recipes/{pk}/', data=json.dumps(recipe2), content_type="application/json")
+    recipe = Recipe.objects.get(pk=response1['pk'])
+    self.assertEqual(recipe.name, "recipe 2")
+    steps = recipe.step_set.all()
+    ingredients = recipe.ingredient_set.all()
+    step2 = Step.objects.get(step_text="Do second thing")
+    ingredient2 = Ingredient.objects.get(text="Second ingredient")
+    self.assertIn(step2, steps)
+    self.assertIn(ingredient2, ingredients)
 
 
 

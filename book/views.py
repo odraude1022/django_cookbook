@@ -65,3 +65,41 @@ def new_recipe(request):
     return HttpResponse(json_data)
   except Exception as e:
     return JsonResponse({"error": str(e)})
+
+@csrf_exempt
+def update_recipe(request, recipe_id):
+  recipe = Recipe.objects.get(pk=recipe_id)
+  data = json.loads(request.body)
+  name = data.get('name')
+  steps = []
+  ingredients = []
+  try:
+    steps = list(data.get('steps'))
+  except Exception as e:
+    pass
+  try:
+    ingredients = list(data.get('ingredients'))
+  except Exception as e:
+    pass
+  if steps:
+    recipe.step_set.all().delete()
+    for step in steps:
+      Step(recipe_id=recipe.pk, step_text=step).save()
+
+  if ingredients:
+    recipe.ingredient_set.all().delete()
+    for ingredient in ingredients:
+      Ingredient(recipe_id=recipe.pk, text=ingredient).save()
+
+  if name:
+    recipe.name = name
+
+  recipe.save()
+  serializer = RecipeSerializer(recipe)
+  json_data = JSONRenderer().render(serializer.data)
+  return HttpResponse(json_data)
+
+
+
+
+
